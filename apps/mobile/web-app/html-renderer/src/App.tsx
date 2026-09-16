@@ -1,0 +1,33 @@
+import { createStore, Provider, useAtomValue } from "jotai"
+
+import { entryAtom, noMediaAtom, readerRenderInlineStyleAtom, spotlightAtom } from "./atoms"
+import { HTML } from "./HTML"
+import { WebViewBridgeManager } from "./managers/webview-bridge"
+
+const store = createStore()
+
+// Initialize and expose WebView bridge functions
+const bridgeManager = new WebViewBridgeManager(store)
+bridgeManager.exposeToWindow()
+
+export const App = () => {
+  const entry = useAtomValue(entryAtom, { store })
+  const readerRenderInlineStyle = useAtomValue(readerRenderInlineStyleAtom, { store })
+  const noMedia = useAtomValue(noMediaAtom, { store })
+  const spotlightRules = useAtomValue(spotlightAtom, { store })
+  const coverMedia = entry?.media?.[0]
+
+  return (
+    <Provider store={store}>
+      <HTML
+        renderInlineStyle={readerRenderInlineStyle}
+        noMedia={noMedia}
+        spotlightRules={spotlightRules}
+        coverImageUrl={coverMedia?.type === "photo" ? coverMedia.url : undefined}
+        baseUrl={entry?.url ?? undefined}
+      >
+        {entry?.content}
+      </HTML>
+    </Provider>
+  )
+}
