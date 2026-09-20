@@ -6,16 +6,16 @@
   "description": "FoLocal — a standalone, local-first RSS reader desktop app based on Folo (AGPL-3.0)",
   "author": "Guyungy and contributors",
   "license": "AGPL-3.0-only",
-  "homepage": "https://github.com/Guyungy/Folo-Local",
+  "homepage": "https://github.com/Guyungy/FoLocal",
   "repository": {
-    "url": "https://github.com/Guyungy/Folo-Local",
+    "url": "https://github.com/Guyungy/FoLocal",
     "type": "git"
   },
   "scripts": {
     "build:packages": "turbo run build --filter=\"./packages/**/*\"",
     "build:web": "turbo run Folo#build:web",
     "dedupe:locales": "eslint --fix locales/**",
-    "depcheck": "npx depcheck --quiet",
+    "depcheck": "pnpm exec depcheck --quiet",
     "dev:web": "turbo run @follow/web#dev @follow/ssr#dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -23,7 +23,7 @@
     "lint:fix": "eslint --fix",
     "lint:tsl": "tsslint --project apps/*/tsconfig.json",
     "mitproxy": "bash scripts/run-proxy.sh",
-    "polyfill-optimize": "pnpx nolyfill install",
+    "polyfill-optimize": "pnpm dlx nolyfill install",
     "postinstall": "pnpm run build:packages",
     "prepare": "simple-git-hooks && corepack prepare",
     "reinstall": "rm -rf node_modules && rm -rf apps/**/node_modules && rm -rf packages/**/node_modules && pnpm install",
@@ -76,7 +76,7 @@
       "bash scripts/increment-build-id.sh"
     ],
     "locales/**/*.json": [
-      "npm run dedupe:locales",
+      "pnpm run dedupe:locales",
       "git add locales"
     ]
   }

@@ -18,7 +18,7 @@ const communityLinks: LinkItem[] = [
   { label: 'Discord', href: 'https://discord.gg/AwWcAQ7euc', external: true },
   {
     label: 'GitHub',
-    href: 'https://github.com/Guyungy/Folo-Local',
+    href: 'https://github.com/Guyungy/FoLocal',
     external: true,
   },
   { label: 'Twitter', href: 'https://x.com/folo_is', external: true },

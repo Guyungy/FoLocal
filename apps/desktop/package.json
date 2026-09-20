@@ -1,14 +1,14 @@
 {
   "name": "Folo",
   "type": "module",
-  "version": "1.13.0",
+  "version": "1.13.2",
   "private": true,
   "description": "FoLocal — a standalone, local-first RSS reader desktop app based on Folo (AGPL-3.0)",
   "author": "Guyungy and contributors",
   "license": "AGPL-3.0-only",
-  "homepage": "https://github.com/Guyungy/Folo-Local",
+  "homepage": "https://github.com/Guyungy/FoLocal",
   "repository": {
-    "url": "https://github.com/Guyungy/Folo-Local",
+    "url": "https://github.com/Guyungy/FoLocal",
     "type": "git"
   },
   "main": "./dist/main/index.js",
@@ -25,7 +25,7 @@
     "build:web": "rm -rf out/web && cross-env WEB_BUILD=1 vite build",
     "bump": "vv --minor",
     "dedupe:locales": "eslint --fix locales/**/*.json",
-    "depcheck": "npx depcheck --quiet",
+    "depcheck": "pnpm exec depcheck --quiet",
     "dev": "turbo run @follow/web#dev @follow/ssr#dev",
     "dev:debug": "export DEBUG=true && vite --debug",
     "dev:electron": "electron-vite dev",

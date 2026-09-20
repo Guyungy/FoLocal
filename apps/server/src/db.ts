@@ -23,6 +23,10 @@ class Database extends DatabaseSync {
 }
 
 export const db = new Database(databasePath)
+export const SCHEMA_VERSION = 1
+const schema = db.prepare("PRAGMA user_version").get() as { user_version: number }
+if (schema.user_version > SCHEMA_VERSION)
+  throw new Error("This database requires a newer FoLocal version")
 db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON")
 
 db.exec(`
@@ -110,6 +114,36 @@ db.exec(
 const summaryColumns = db.prepare("PRAGMA table_info(summaries)").all() as { name: string }[]
 if (!summaryColumns.some((column) => column.name === "source_hash"))
   db.exec("ALTER TABLE summaries ADD COLUMN source_hash TEXT")
+
+db.transaction(() => {
+  db.exec(`CREATE TABLE IF NOT EXISTS feed_refresh_state (
+    feed_id TEXT PRIMARY KEY REFERENCES feeds(id) ON DELETE CASCADE,
+    failures INTEGER NOT NULL DEFAULT 0,
+    last_attempt_at TEXT, next_attempt_at TEXT,
+    paused INTEGER NOT NULL DEFAULT 0
+  ); PRAGMA user_version = 1;`)
+})()
+
+const refreshColumns = new Set(
+  (db.prepare("PRAGMA table_info(feed_refresh_state)").all() as { name: string }[]).map(
+    (row) => row.name,
+  ),
+)
+for (const [name, type] of [
+  ["error_kind", "TEXT"],
+  ["last_duration_ms", "INTEGER"],
+]) {
+  if (!refreshColumns.has(name!))
+    db.exec(`ALTER TABLE feed_refresh_state ADD COLUMN ${name} ${type}`)
+}
+// Recover offline states written by releases that did not store a structured error category.
+db.exec(`UPDATE feed_refresh_state SET error_kind='offline'
+  WHERE error_kind IS NULL AND feed_id IN (
+    SELECT id FROM feeds WHERE error_message LIKE '%ERR_INTERNET_DISCONNECTED%'
+  );
+  CREATE TABLE IF NOT EXISTS refresh_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, result TEXT NOT NULL
+  );`)
 
 export const getLocalSetting = (key: string): string | null => {
   const row = db.prepare("SELECT value FROM local_settings WHERE key=?").get(key) as

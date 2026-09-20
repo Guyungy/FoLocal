@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
     :tvos => '15.1'
   }
   s.swift_version  = '5.4'
-  s.source         = { git: 'https://github.com/Guyungy/Folo-Local' }
+  s.source         = { git: 'https://github.com/Guyungy/FoLocal' }
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'

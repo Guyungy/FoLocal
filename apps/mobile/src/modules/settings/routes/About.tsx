@@ -36,7 +36,7 @@ const links = [
   {
     title: "GitHub",
     icon: GithubCuteFiIcon,
-    url: "https://github.com/Guyungy/Folo-Local",
+    url: "https://github.com/Guyungy/FoLocal",
     iconBackgroundColor: "#000000",
     iconColor: "#FFFFFF",
   },
@@ -152,7 +152,7 @@ export const AboutScreen = () => {
               }}
               components={{
                 OpenIssueLink: (
-                  <Link className="text-accent" href="https://github.com/Guyungy/Folo-Local" />
+                  <Link className="text-accent" href="https://github.com/Guyungy/FoLocal" />
                 ),
                 ExternalLinkIcon: <View />,
               }}

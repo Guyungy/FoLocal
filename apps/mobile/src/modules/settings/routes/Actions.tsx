@@ -71,7 +71,7 @@ export const ActionsScreen = () => {
           >
             <Link
               className="center mt-4 w-44 rounded-full border border-accent py-0.5 text-accent"
-              href="https://github.com/Guyungy/Folo-Local"
+              href="https://github.com/Guyungy/FoLocal"
             >
               <View className="flex w-full flex-row items-center justify-center gap-1">
                 <Book6CuteReIcon color={accentColor} width={16} height={16} />

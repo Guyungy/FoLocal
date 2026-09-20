@@ -18,6 +18,8 @@ import {
 } from "./ai.js"
 import { articleContext } from "./chat-context.js"
 import { databasePath, db, jsonValue } from "./db.js"
+import { normalizeFeedImage } from "./feed-image.js"
+import { localRoutes } from "./local-routes.js"
 import type { ParsedSubscription } from "./opml.js"
 import { buildOpml, parseOpml } from "./opml.js"
 import { refreshFeed } from "./rss.js"
@@ -34,10 +36,9 @@ import {
 import {
   getRefreshIntervalMinutes,
   getRefreshStatus,
-  isRefreshRunning,
+  refreshFeedById,
   refreshFeedsByIds,
   runFullRefreshSweep,
-  setRefreshIntervalMinutes,
   startRefreshScheduler,
   stopRefreshScheduler,
 } from "./scheduler.js"
@@ -84,7 +85,7 @@ const feedFromRow = (row: Record<string, unknown>): Feed & { type: "feed" } => (
   url: String(row.url),
   title: row.title as string | null,
   description: row.description as string | null,
-  image: row.image as string | null,
+  image: normalizeFeedImage(row.image, row.site_url || row.url),
   siteUrl: row.site_url as string | null,
   ownerUserId: row.owner_user_id as string | null,
   errorAt: row.error_at as string | null,
@@ -574,7 +575,7 @@ app.get("/feeds/refresh", async (c) => {
     { url: string } | undefined
   if (!row) return c.json({ code: 404, message: "Feed not found" }, 404)
   try {
-    const result = await refreshFeed(row.url, { conditional: c.req.query("conditional") !== "0" })
+    const result = await refreshFeedById(c.req.query("id")!)
     return c.json(ok({ notModified: result.notModified }))
   } catch (error) {
     db.prepare("UPDATE feeds SET error_at=?, error_message=? WHERE url=?").run(
@@ -600,37 +601,12 @@ app.post("/feeds/refresh", async (c) => {
     (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !id.trim()))
   )
     return c.json({ code: 400, message: "ids must be an array of nonempty feed IDs" }, 400)
-  if (isRefreshRunning()) return c.json({ code: 409, message: "A refresh is already running" }, 409)
   // An explicit empty selection must not unexpectedly refresh every subscription.
   const result = Array.isArray(ids) ? await refreshFeedsByIds(ids) : await runFullRefreshSweep()
   return c.json(ok(result))
 })
 
-app.get("/local/refresh-status", (c) =>
-  c.json(
-    ok({
-      intervalMinutes: getRefreshIntervalMinutes(),
-      lastRun: getRefreshStatus(),
-      running: isRefreshRunning(),
-    }),
-  ),
-)
-
-app.get("/settings/refresh", (c) =>
-  c.json(ok({ intervalMinutes: getRefreshIntervalMinutes(), lastRun: getRefreshStatus() })),
-)
-app.put("/settings/refresh", async (c) => {
-  const body = await c.req.json<{ intervalMinutes?: number }>()
-  try {
-    setRefreshIntervalMinutes(body.intervalMinutes ?? 0)
-  } catch (error) {
-    return c.json(
-      { code: 400, message: error instanceof Error ? error.message : "Invalid interval" },
-      400,
-    )
-  }
-  return c.json(ok({ intervalMinutes: getRefreshIntervalMinutes() }))
-})
+app.route("/", localRoutes)
 
 const subscriptionFromRow = (row: Record<string, unknown>) => ({
   id: String(row.id),
@@ -1204,5 +1180,7 @@ app.onError((error, c) => {
 })
 
 export { app }
+export { setNetworkFetch } from "./network.js"
+export { setNetworkOnline } from "./scheduler.js"
 export { databasePath }
 export { getRefreshIntervalMinutes, getRefreshStatus, startRefreshScheduler, stopRefreshScheduler }

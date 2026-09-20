@@ -1,4 +1,5 @@
 import { db, getLocalSetting, setLocalSetting } from "./db.js"
+import { describeNetworkError, networkFetch } from "./network.js"
 
 /**
  * RSSHub routes are served by community instances that come and go without notice. The upstream
@@ -313,11 +314,11 @@ export const probeInstance = async (
     const target = `${base}${route.startsWith("/") ? route : `/${route}`}`
     const startedAt = Date.now()
     try {
-      const response = await fetch(target, {
+      const response = await networkFetch(target, {
         headers: {
           accept:
             "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.1",
-          "user-agent": "FoLocal/1.13.0 (+https://github.com/Guyungy/Folo-Local)",
+          "user-agent": "FoLocal/1.13.0 (+https://github.com/Guyungy/FoLocal)",
         },
         signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
       })
@@ -335,9 +336,7 @@ export const probeInstance = async (
       const message =
         error instanceof Error && error.name === "TimeoutError"
           ? `timed out after ${PROBE_TIMEOUT_MS / 1000} seconds`
-          : error instanceof Error
-            ? error.message
-            : "request failed"
+          : describeNetworkError(error)
       results.push({ route, ok: false, status: null, latencyMs, error: message })
     }
   }

@@ -1,0 +1,7 @@
+{
+  "repository": "Guyungy/FoLocal",
+  "base": "dev",
+  "upstreams": [
+    { "name": "folo", "remote": "upstream-folo", "repository": "RSSNext/Folo", "branch": "dev" }
+  ]
+}

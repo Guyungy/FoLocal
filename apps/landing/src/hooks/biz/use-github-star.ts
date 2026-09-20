@@ -12,7 +12,7 @@ export const useGithubStar = () =>
     queryKey: ['github-star'],
     queryFn: async () => {
       try {
-        const response = await fetch('https://ungh.cc/repos/Guyungy/Folo-Local')
+        const response = await fetch('https://ungh.cc/repos/Guyungy/FoLocal')
 
         if (!response.ok) {
           throw new Error(`Failed to fetch repo stats: ${response.status}`)

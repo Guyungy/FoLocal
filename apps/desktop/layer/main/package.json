@@ -4,9 +4,9 @@
   "private": true,
   "author": "Guyungy and contributors",
   "license": "GPL-3.0-only",
-  "homepage": "https://github.com/Guyungy/Folo-Local",
+  "homepage": "https://github.com/Guyungy/FoLocal",
   "repository": {
-    "url": "https://github.com/Guyungy/Folo-Local",
+    "url": "https://github.com/Guyungy/FoLocal",
     "type": "git"
   },
   "exports": {

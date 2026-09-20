@@ -84,7 +84,7 @@ export const LandingHeader: Component = () => {
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* <Link
-              href="https://github.com/Guyungy/Folo-Local"
+              href="https://github.com/Guyungy/FoLocal"
               target="_blank"
               rel="noreferrer noopener"
               className={cx(
@@ -160,7 +160,7 @@ LandingHeader.displayName = 'LandingHeader'
 
 //       <div className="flex flex-col gap-3">
 //         <Link
-//           href="https://github.com/Guyungy/Folo-Local"
+//           href="https://github.com/Guyungy/FoLocal"
 //           target="_blank"
 //           rel="noreferrer noopener"
 //           className={cx(

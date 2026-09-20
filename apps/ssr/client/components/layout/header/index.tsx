@@ -93,7 +93,7 @@ export const Header = () => {
           <div className="flex shrink-0 items-center gap-2">
             {/* GitHub stars pill */}
             <m.a
-              href="https://github.com/Guyungy/Folo-Local"
+              href="https://github.com/Guyungy/FoLocal"
               target="_blank"
               rel="noreferrer"
               whileHover={{ scale: 1.02 }}

@@ -29,7 +29,7 @@ export function RepoStats() {
       />
 
       <Link
-        href="https://github.com/Guyungy/Folo-Local"
+        href="https://github.com/Guyungy/FoLocal"
         target="_blank"
         rel="noreferrer noopener"
         className={cx(
@@ -45,7 +45,7 @@ export function RepoStats() {
           <span className="text-sm">{t('repository')}</span>
         </div>
         <div className="mt-1 text-base tabular-nums text-text-tertiary">
-          Guyungy/Folo-Local
+          Guyungy/FoLocal
         </div>
         <i
           className="i-mingcute-arrow-right-up-line size-4 text-text-tertiary absolute right-3 top-8 lg:top-1/2 -translate-y-1/2"

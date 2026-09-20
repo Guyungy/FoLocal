@@ -201,7 +201,7 @@ export const registerAppMenu = () => {
           click: () => {
             WindowManager.createWindow({
               extraPath: `#add?url=${encodeURIComponent(
-                "https://github.com/Guyungy/Folo-Local/releases.atom",
+                "https://github.com/Guyungy/FoLocal/releases.atom",
               )}`,
               width: 800,
               height: 600,

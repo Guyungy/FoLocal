@@ -1348,8 +1348,8 @@ Run:
 pnpm run typecheck
 pnpm run lint:fix
 pnpm run test
-npm exec turbo run format:check typecheck lint
-npm exec turbo run test
+pnpm exec turbo run format:check typecheck lint
+pnpm exec turbo run test
 ```
 
 Expected: PASS across the monorepo with no new lint, type, or test failures.

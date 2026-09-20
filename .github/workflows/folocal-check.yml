@@ -1,0 +1,101 @@
+name: FoLocal Checks
+
+on:
+  push:
+    branches: [dev, "sync/**"]
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Build a macOS Apple Silicon installer after checks pass
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: folocal-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-desktop:
+    if: github.repository == 'Guyungy/FoLocal'
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env:
+      VITE_WEB_URL: http://localhost:5173
+      VITE_API_URL: http://localhost:3000
+      VITE_BUILD_TYPE: production
+      NODE_OPTIONS: --max-old-space-size=8192
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --registry=https://registry.npmjs.org
+      - name: Build main process declarations
+        run: pnpm --filter @follow/electron-main build
+      - name: Typecheck local desktop and server
+        run: pnpm --filter @follow/server --filter @follow/electron-main --filter @follow/web typecheck
+      - name: Lint maintained local changes
+        run: >-
+          pnpm exec eslint
+          apps/desktop/layer/main/src/lib/local-identity*.ts
+          apps/desktop/layer/main/src/before-bootstrap.ts
+          apps/desktop/layer/main/src/before-bootstrap.test.ts
+          apps/desktop/layer/main/src/manager/app.ts
+          apps/desktop/layer/main/src/manager/app.test.ts
+          apps/desktop/layer/main/src/manager/bootstrap.ts
+          apps/desktop/layer/renderer/src/lib/local-icons*.ts
+          apps/server/src
+          apps/desktop/layer/main/src/lib/profile-backup*.ts
+          apps/desktop/layer/main/src/lib/local-app*.ts
+          apps/desktop/layer/main/src/lib/proxy*.ts
+          apps/desktop/layer/main/src/profile-startup.ts
+          apps/desktop/layer/main/src/ipc/services/profile.ts
+          apps/desktop/layer/renderer/src/modules/settings/tabs/local-reliability.tsx
+          apps/desktop/layer/renderer/src/modules/settings/tabs/local-refresh-history.tsx
+          apps/desktop/layer/renderer/src/modules/player/entry-tts.test.ts
+      - name: Test server and isolation
+        run: |
+          pnpm --filter @follow/server test
+          pnpm --filter @follow/electron-main exec vitest run src/before-bootstrap.test.ts src/lib/local-identity.test.ts src/lib/profile-backup.test.ts src/lib/proxy.test.ts src/lib/local-app.test.ts src/manager/app.test.ts
+          pnpm --filter @follow/web exec vitest run src/lib/local-icons.test.ts src/hooks/use-local-refresh-sync.test.tsx src/modules/player/entry-tts.test.ts
+      - name: Build Electron application
+        run: pnpm --filter Folo build:electron-vite
+      - name: Package macOS Apple Silicon application
+        if: github.event_name == 'workflow_dispatch' && inputs.package
+        working-directory: apps/desktop
+        env:
+          OSX_SIGN_IDENTITY: "-"
+          BUILD_VERSION: ${{ github.run_number }}
+        run: |
+          test "$(uname -m)" = arm64
+          node ../../node_modules/@electron-forge/cli/dist/electron-forge.js package --platform=darwin --arch=arm64
+          test -d out/FoLocal-darwin-arm64/FoLocal.app
+          codesign --verify --deep --strict out/FoLocal-darwin-arm64/FoLocal.app
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' out/FoLocal-darwin-arm64/FoLocal.app/Contents/Info.plist)" = is.folocal.local
+      - name: Create installer and checksums
+        if: github.event_name == 'workflow_dispatch' && inputs.package
+        working-directory: apps/desktop
+        run: |
+          mkdir -p out/installer out/dmg-root
+          ditto out/FoLocal-darwin-arm64/FoLocal.app out/dmg-root/FoLocal.app
+          ln -s /Applications out/dmg-root/Applications
+          hdiutil create -volname FoLocal -srcfolder out/dmg-root -format UDZO "out/installer/FoLocal-macos-arm64-${GITHUB_SHA:0:12}.dmg"
+          ditto -c -k --sequesterRsrc --keepParent out/FoLocal-darwin-arm64/FoLocal.app "out/installer/FoLocal-macos-arm64-${GITHUB_SHA:0:12}.zip"
+          printf 'Repository: %s\nCommit: %s\nBuild: %s\nSigning: ad-hoc, not notarized\n' "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$GITHUB_RUN_NUMBER" > out/installer/BUILD-INFO.txt
+          cd out/installer
+          shasum -a 256 *.dmg *.zip > SHA256SUMS.txt
+      - name: Upload installers
+        if: github.event_name == 'workflow_dispatch' && inputs.package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FoLocal-macos-arm64-${{ github.sha }}
+          path: apps/desktop/out/installer/
+          if-no-files-found: error
+          retention-days: 30

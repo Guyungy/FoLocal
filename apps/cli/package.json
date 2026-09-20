@@ -5,10 +5,10 @@
   "description": "Folo CLI for terminal workflows and automation",
   "author": "Folo Team",
   "license": "AGPL-3.0-only",
-  "homepage": "https://github.com/Guyungy/Folo-Local",
+  "homepage": "https://github.com/Guyungy/FoLocal",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Guyungy/Folo-Local.git"
+    "url": "git+https://github.com/Guyungy/FoLocal.git"
   },
   "keywords": [
     "folo",
