@@ -93,7 +93,7 @@ jobs:
           shasum -a 256 *.dmg *.zip > SHA256SUMS.txt
       - name: Upload installers
         if: github.event_name == 'workflow_dispatch' && inputs.package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: FoLocal-macos-arm64-${{ github.sha }}
           path: apps/desktop/out/installer/
