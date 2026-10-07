@@ -85,7 +85,7 @@ jobs:
 
       # Optional: Upload artifact
       - name: 📤 Upload IPA
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: app-ios
           path: apps/mobile/build.ipa
@@ -146,7 +146,7 @@ jobs:
           npm_config_shamefully_hoist: "false"
       # Optional: Upload artifact
       - name: 📤 Upload IPA
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: app-ios
           path: apps/mobile/build.ipa

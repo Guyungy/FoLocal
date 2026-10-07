@@ -233,7 +233,7 @@ jobs:
         run: pnpm build:render
 
       - name: Upload file (macos-arm64-dmg)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: runner.os == 'macOS'
         with:
           name: macos-arm64-dmg
@@ -243,7 +243,7 @@ jobs:
           retention-days: 90
 
       - name: Upload file (macos-x64-dmg)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: runner.os == 'macOS'
         with:
           name: macos-x64-dmg
@@ -253,7 +253,7 @@ jobs:
           retention-days: 90
 
       - name: Upload file (macos-mas-pkg)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: runner.os == 'macOS'
         with:
           name: macos-mas-pkg
@@ -280,7 +280,7 @@ jobs:
           .github/scripts/upload-mas-pkg.sh "$pkg_path"
 
       - name: Upload file (windows-x64-exe unsigned)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         id: upload-unsigned-windows-x64-exe
         if: runner.os == 'windows' && github.event.inputs.store != 'true'
         with:
@@ -307,7 +307,7 @@ jobs:
         run: pnpm exec tsx apps/desktop/scripts/update-windows-yml.ts
 
       - name: Upload file (windows-x64-exe signed)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: runner.os == 'windows' && env.RELEASE == 'true' && github.event.inputs.store != 'true'
         with:
           name: windows-x64-exe
@@ -318,7 +318,7 @@ jobs:
           overwrite: true
 
       - name: Upload file (windows-x64-appx)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: runner.os == 'windows'
         with:
           name: windows-x64-appx
@@ -327,7 +327,7 @@ jobs:
           retention-days: 90
 
       - name: Upload file (linux-x64-appimage)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: runner.os == 'linux'
         with:
           name: linux-x64-appimage
@@ -337,7 +337,7 @@ jobs:
           retention-days: 90
 
       - name: Upload file (linux-x64-deb)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: runner.os == 'linux'
         with:
           name: linux-x64-deb
@@ -380,7 +380,7 @@ jobs:
 
       - name: Upload release assets for aggregation
         if: env.RELEASE == 'true'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: desktop-release-assets-${{ runner.os }}
           path: ${{ runner.temp }}/desktop-release-assets
